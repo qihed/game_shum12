@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ШУМ.net</title>
+  <style>
+    :root {
+      --pink: #ff1493;
+      --mint: #86d2c5;
+      --dark: #111111;
+      --white: #ffffff;
+      --soft: #f7fffd;
+      --shadow: 0 18px 55px rgba(255, 20, 147, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      font-family: Montserrat, Arial, Helvetica, sans-serif;
+      color: var(--pink);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    button, input { font: inherit; }
+
+    .page {
+      min-height: 100vh;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      padding: 24px 28px 86px;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(134, 210, 197, .22), transparent 28%),
+        radial-gradient(circle at 90% 88%, rgba(255, 20, 147, .10), transparent 30%),
+        var(--white);
+    }
+
+    .search-shell {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 24px;
+      justify-items: center;
+      transform: translateY(-11vh);
+    }
+
+    .logo {
+      margin: 0;
+      font-size: clamp(64px, 10vw, 132px);
+      line-height: .92;
+      letter-spacing: .01em;
+      font-weight: 1000;
+      color: var(--pink);
+      text-align: center;
+    }
+
+    .logo span {
+      color: var(--mint);
+    }
+
+    .search-area {
+      width: min(840px, 100%);
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      min-height: 78px;
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px 10px 18px;
+      border: 4px solid var(--mint);
+      border-radius: 999px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      transition: border-color .2s ease, transform .2s ease;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--pink);
+      transform: translateY(-2px);
+    }
+
+    .search-icon {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--mint);
+      color: var(--white);
+      font-size: 24px;
+      font-weight: 1000;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .search-input {
+      width: 100%;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      color: var(--pink);
+      background: transparent;
+      font-size: clamp(20px, 2.2vw, 34px);
+      font-weight: 850;
+      letter-spacing: .015em;
+      padding: 0 4px;
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 20, 147, .46);
+      opacity: 1;
+    }
+
+    .search-button {
+      border: 0;
+      min-height: 52px;
+      padding: 0 24px;
+      border-radius: 999px;
+      background: var(--pink);
+      color: var(--white);
+      font-weight: 1000;
+      font-size: 18px;
+      letter-spacing: .02em;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .suggestions {
+      position: absolute;
+      z-index: 10;
+      top: calc(100% + 14px);
+      left: 0;
+      right: 0;
+      max-height: min(48vh, 510px);
+      overflow: auto;
+      padding: 14px;
+      border: 4px solid var(--mint);
+      border-radius: 34px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+    }
+
+    .suggestions.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .suggestion {
+      width: 100%;
+      border: 0;
+      border-radius: 22px;
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr);
+      gap: 13px;
+      align-items: start;
+      text-align: left;
+      color: var(--pink);
+      background: var(--white);
+      cursor: default;
+      transition: background-color .18s ease;
+    }
+
+    .suggestion:hover {
+      background: var(--soft);
+    }
+
+    .suggestion-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      background: var(--mint);
+      font-weight: 1000;
+      font-size: 17px;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .suggestion-main {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .query-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      min-width: 0;
+      font-size: clamp(18px, 1.8vw, 27px);
+      line-height: 1.18;
+      font-weight: 900;
+      letter-spacing: .015em;
+    }
+
+    .visible-part {
+      color: var(--pink);
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .hidden-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.35em;
+    }
+
+    .hidden-text {
+      color: var(--pink);
+      white-space: normal;
+    }
+
+    .black-cover {
+      position: absolute;
+      inset: -3px -8px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--mint);
+      cursor: pointer;
+      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+    }
+
+    .black-cover:hover {
+      transform: translateY(-1px);
+    }
+
+    .hidden-wrap.revealed .black-cover {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .meta-line {
+      width: fit-content;
+      max-width: 100%;
+      position: relative;
+      color: var(--mint);
+      font-size: clamp(14px, 1.15vw, 18px);
+      line-height: 1.18;
+      font-weight: 850;
+      letter-spacing: .015em;
+    }
+
+    .meta-line .black-cover {
+      inset: -3px -7px;
+      border-radius: 6px;
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: 14px 16px 54px; align-items: start; }
+      .search-shell { transform: none; padding-top: 4vh; gap: 18px; }
+      .search-box {
+        min-height: 68px;
+        grid-template-columns: 44px minmax(0, 1fr);
+        border-width: 3px;
+        padding: 10px 14px;
+      }
+      .search-button { display: none; }
+      .search-icon { width: 38px; height: 38px; font-size: 20px; }
+      .suggestions { border-width: 3px; border-radius: 26px; padding: 9px; }
+      .suggestion { grid-template-columns: 30px minmax(0, 1fr); gap: 10px; padding: 12px; border-radius: 18px; }
+      .suggestion-icon { width: 30px; height: 30px; font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="search-shell" aria-label="Поисковик ШУМ.net">
+      <h1 class="logo">ШУМ<span>.net</span></h1>
+
+      <div class="search-area" id="searchArea">
+        <form class="search-box" id="searchForm">
+          <div class="search-icon">⌕</div>
+          <input
+            class="search-input"
+            id="searchInput"
+            type="text"
+            autocomplete="off"
+            placeholder="Введите запрос"
+            aria-label="Поисковая строка"
+          />
+          <button class="search-button" type="submit">Найти</button>
+        </form>
+
+        <div class="suggestions" id="suggestions" aria-label="Последние запросы"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const requests = [
+      { query: 'Овальная планета', visible: 'Овальная', hidden: 'планета' },
+      { query: 'Николь кидман 1990' },
+      { query: 'Токио диснейленд' },
+      {
+        query: 'Евгения медведева никита нагорный сальто назад',
+        visible: 'Евгения медведева никита нагорный',
+        hidden: 'сальто назад'
+      },
+      {
+        query: 'Как долго срастаются кости',
+        visible: 'Как\u00A0долго',
+        hidden: 'срастаются кости'
+      },
+      {
+        query: 'Может ли человек превратиться в нефть',
+        visible: 'Может ли человек превратиться в',
+        hidden: 'нефть'
+      },
+      { query: 'Элизабет тейлор', meta: 'Актриса' },
+      {
+        query: 'Самые необычные планеты',
+        visible: 'Самые необычные',
+        hidden: 'планеты'
+      },
+      { query: 'Чарли и шоколадная фабрика', meta: 'Фильм, 2005' },
+      {
+        query: 'Частота усиливающая заживление костей',
+        visible: 'Частота усиливающая',
+        hidden: 'заживление костей'
+      },
+      {
+        query: 'Как называется фильм где мальчик объелся кураги и у него отказали почки',
+        visible: 'Как\u00A0называется фильм где мальчик',
+        hidden: 'объелся кураги и у него отказали почки'
+      },
+      { query: 'Лайза минелли', meta: 'Американская актриса и певица' }
+    ];
+
+    const searchArea = document.getElementById('searchArea');
+    const searchInput = document.getElementById('searchInput');
+    const suggestions = document.getElementById('suggestions');
+    const searchForm = document.getElementById('searchForm');
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function splitQuery(item) {
+      const normalized = String(item.query).trim().replace(/\s+/g, ' ');
+      if (item.visible || item.hidden) {
+        return {
+          visible: item.visible || normalized,
+          hidden: item.hidden || ''
+        };
+      }
+
+      const parts = normalized.split(' ');
+      const visible = parts.shift() || normalized;
+      const hidden = parts.join(' ');
+      return { visible, hidden };
+    }
+
+    function renderHiddenText(text, extraClass = '') {
+      if (!text) return '';
+      return `
+        <span class="hidden-wrap ${extraClass}">
+          <span class="hidden-text">${escapeHtml(text)}</span>
+          <button class="black-cover" type="button" aria-label="Открыть скрытый текст"></button>
+        </span>
+      `;
+    }
+
+    function renderSuggestions() {
+      suggestions.innerHTML = requests.map((item, index) => {
+        const { visible, hidden } = splitQuery(item);
+        return `
+          <div class="suggestion" role="button" aria-label="Поисковый запрос ${index + 1}">
+            <div class="suggestion-icon">${index + 1}</div>
+            <div class="suggestion-main">
+              <div class="query-line">
+                <span class="visible-part">${escapeHtml(visible)}</span>
+                ${renderHiddenText(hidden)}
+              </div>
+              ${item.meta ? `<div class="meta-line">${renderHiddenText(item.meta, 'meta-hidden')}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openSuggestions() {
+      suggestions.classList.add('open');
+    }
+
+    function closeSuggestions() {
+      suggestions.classList.remove('open');
+    }
+
+    suggestions.addEventListener('click', (event) => {
+      const cover = event.target.closest('.black-cover');
+      if (cover) {
+        cover.closest('.hidden-wrap')?.classList.add('revealed');
+        event.stopPropagation();
+        return;
+      }
+
+      const suggestion = event.target.closest('.suggestion');
+      if (!suggestion) return;
+      const index = Array.from(suggestions.children).indexOf(suggestion);
+      const request = requests[index];
+      if (request) searchInput.value = request.query;
+    });
+
+    searchInput.addEventListener('focus', openSuggestions);
+    searchInput.addEventListener('click', openSuggestions);
+
+    document.addEventListener('click', (event) => {
+      if (!searchArea.contains(event.target)) closeSuggestions();
+    });
+
+    searchForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      openSuggestions();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeSuggestions();
+    });
+
+    renderSuggestions();
+  </script>
+</body>
+</html>

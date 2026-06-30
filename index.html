@@ -269,8 +269,51 @@
       border-radius: 6px;
     }
 
+
+    .profile-chip {
+      position: fixed;
+      top: 24px;
+      right: 28px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 16px 9px 10px;
+      border: 3px solid var(--mint);
+      border-radius: 999px;
+      background: var(--white);
+      box-shadow: var(--shadow);
+      color: var(--pink);
+      font-weight: 950;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: .01em;
+      white-space: nowrap;
+    }
+
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--pink);
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 1000;
+      letter-spacing: .02em;
+      box-shadow: inset 0 0 0 4px rgba(134, 210, 197, .55);
+    }
+
     @media (max-width: 720px) {
-      .page { padding: 14px 16px 54px; align-items: start; }
+      .profile-chip {
+        top: 12px;
+        right: 12px;
+        padding: 7px 12px 7px 8px;
+        font-size: 14px;
+      }
+      .profile-avatar { width: 34px; height: 34px; font-size: 13px; }
+      .page { padding: 74px 16px 54px; align-items: start; }
       .search-shell { transform: none; padding-top: 4vh; gap: 18px; }
       .search-box {
         min-height: 68px;
@@ -287,6 +330,11 @@
   </style>
 </head>
 <body>
+  <div class="profile-chip" aria-label="Профиль Евгения Медведева">
+    <div class="profile-avatar" aria-hidden="true">ЕМ</div>
+    <div class="profile-name">Евгения Медведева</div>
+  </div>
+
   <main class="page">
     <section class="search-shell" aria-label="Поисковик ШУМ.net">
       <h1 class="logo">ШУМ<span>.net</span></h1>
